@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Text Extraction</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #loading { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4">
+            <h1 class="text-2xl font-bold">OCR Text Extraction</h1>
+            <p class="text-sm">Upload images to extract text using Tesseract OCR</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Upload Form -->
+        <section class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <form id="upload-form" method="POST" enctype="multipart/form-data" class="flex flex-col items-center">
+                <input type="file" name="file" accept=".png,.jpg,.jpeg" class="mb-4 p-2 border rounded">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Upload and Extract</button>
+            </form>
+            <div id="loading" class="text-center mt-4">
+                <svg class="animate-spin h-5 w-5 text-blue-500 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"></path>
+                </svg>
+                <span>Processing...</span>
+            </div>
+            {% if error %}
+                <p class="text-red-500 mt-4">{{ error }}</p>
+            {% endif %}
+            {% if success %}
+                <p class="text-green-500 mt-4">{{ success }}</p>
+            {% endif %}
+        </section>
+
+        <!-- Clear Database Button -->
+        <section class="mb-8 text-center">
+            <form method="POST" action="{{ url_for('clear_database') }}">
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Clear Database</button>
+            </form>
+        </section>
+
+        <!-- Results -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Extracted Results</h2>
+            {% if results %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for result in results %}
+                        <div class="bg-white p-4 rounded-lg shadow-md">
+                            <img src="/{{ result.image_path }}" alt="Image" class="w-full h-40 object-cover rounded mb-4">
+                            <h3 class="font-semibold">Extracted Text</h3>
+                            <pre class="text-sm bg-gray-100 p-2 rounded max-h-40 overflow-auto">{{ result.text }}</pre>
+                            <p class="text-sm text-gray-600">Error: {{ result.error if result.error else 'None' }}</p>
+                            {% if result.text != 'N/A' %}
+                                <a href="{{ url_for('download_text', image_path=result.image_path) }}" class="text-blue-500 hover:underline">Download Text</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">No results yet. Upload an image or run process_images.py to start.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 OCR Text Extraction. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for loading indicator -->
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function() {
+            document.getElementById('loading').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
