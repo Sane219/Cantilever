@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>eBay Scraper</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>eBay Product Scraper</h1>
+    <form method="POST" action="/">
+        <input type="text" name="search" placeholder="Search products..." value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
+    {% if error %}
+        <p style="color: red;">Error: {{ error }}</p>
+    {% endif %}
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Reviews</th>
+            <th>Rating</th>
+            <th>Location</th>
+            <th>Units Sold</th>
+            <th>URL</th>
+        </tr>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.title }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.description }}</td>
+            <td>{{ product.reviews }}</td>
+            <td>{{ product.rating }}</td>
+            <td>{{ product.location }}</td>
+            <td>{{ product.units_sold }}</td>
+            <td><a href="{{ product.url }}" target="_blank">Link</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
